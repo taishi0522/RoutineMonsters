@@ -5,24 +5,17 @@
     <title>Routine Monsters Preview</title>
   </head>
   <body>
-    <!-- Reactコンポーネントを描画する場所 -->
     <div id="root"></div>
 
-    <!-- React と ReactDOM を CDN から読み込む -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-    ></script>
+    <!-- React & ReactDOM を CDN から読み込む -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Babel Standalone を読み込む（JSXをブラウザで変換するため） -->
+    <!-- Babel Standalone（JSX をブラウザで変換するため） -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- RoutineMonsters.jsx を読み込む -->
-    <!-- type="text/babel" にすることで、BabelがJSXを変換してくれる -->
+    <!-- JSX ファイルを読み込む -->
+    <!-- RoutineMonsters.jsx がリポジトリの root にある前提 -->
     <script type="text/babel" src="./RoutineMonsters.jsx"></script>
   </body>
 </html>
