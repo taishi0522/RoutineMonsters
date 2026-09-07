@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+function RoutineMonsters() {
+  return (
+    <div>
+      {import React, { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, X, Flame, Coins, Check, Lock, Sparkles, Home, Gift, BookOpen, BarChart3 } from 'lucide-react';
 
 /* ============================== DATA ============================== */
@@ -977,6 +980,10 @@ export default function App() {
       </div>
     </div>
   );
+}}
+    </div>
+  );
 }
+
 
 ReactDOM.render(<RoutineMonsters />, document.getElementById('root'));
