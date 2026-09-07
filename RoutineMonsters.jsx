@@ -978,3 +978,5 @@ export default function App() {
     </div>
   );
 }
+
+ReactDOM.render(<RoutineMonsters />, document.getElementById('root'));
