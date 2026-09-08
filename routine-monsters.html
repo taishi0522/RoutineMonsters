@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Routine Monsters ルーティンモンスターズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#150E2B;
+  --void-deep:#0F0A22;
+  --panel:#201640;
+  --panel-alt:#2A1B52;
+  --line: rgba(169,150,214,0.16);
+  --gold:#F4B740;
+  --mint:#6EE7B7;
+  --coral:#FF6F91;
+  --violet:#B98BFF;
+  --ink:#F5F0FF;
+  --ink-muted:#A996D6;
+  --common:#8FA6C7;
+  --rare:#B98BFF;
+  --legend1:#F4B740;
+  --legend2:#FF6F91;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,.55), transparent),
+    radial-gradient(1.5px 1.5px at 22% 28%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1px 1px at 38% 8%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 52% 34%, rgba(255,255,255,.35), transparent),
+    radial-gradient(1.5px 1.5px at 68% 15%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 82% 42%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1px 1px at 91% 20%, rgba(255,255,255,.45), transparent),
+    radial-gradient(1.5px 1.5px at 14% 62%, rgba(255,255,255,.35), transparent),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,.3), transparent),
+    radial-gradient(1.5px 1.5px at 88% 78%, rgba(255,255,255,.45), transparent),
+    linear-gradient(180deg, var(--void-deep), var(--void) 40%, var(--void-deep));
+  font-family:'Zen Maru Gothic', sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.phone{
+  max-width:440px;
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+
+/* ---------- Header ---------- */
+header.app-head{
+  padding:18px 18px 12px;
+  position:sticky; top:0; z-index:20;
+  background:linear-gradient(180deg, var(--void) 80%, transparent);
+  backdrop-filter:blur(6px);
+}
+.head-top{display:flex; align-items:baseline; justify-content:space-between;}
+.brand{
+  font-family:'Yusei Magic', cursive;
+  font-size:20px;
+  letter-spacing:.5px;
+  color:var(--ink);
+}
+.brand small{display:block; font-family:'Zen Maru Gothic'; font-size:11px; color:var(--ink-muted); font-weight:500; margin-top:2px;}
+.today{font-size:12px; color:var(--ink-muted); font-weight:500;}
+.hud{display:flex; gap:10px; margin-top:12px;}
+.hud-chip{
+  flex:1;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:9px 12px;
+  display:flex; align-items:center; gap:8px;
+}
+.hud-chip .icon{width:22px; height:22px; flex:0 0 auto;}
+.hud-chip .val{font-family:'Yusei Magic'; font-size:16px; line-height:1;}
+.hud-chip .lbl{font-size:10px; color:var(--ink-muted); margin-top:2px;}
+
+/* ---------- Content ---------- */
+main{flex:1; padding:6px 18px 100px; overflow-y:auto;}
+.section-title{
+  font-size:14px; font-weight:700; color:var(--ink);
+  margin:18px 0 10px; display:flex; align-items:center; justify-content:space-between;
+}
+.section-title span.sub{font-size:11px; color:var(--ink-muted); font-weight:500;}
+
+/* ---------- Routine rows ---------- */
+.routine-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px 14px;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:10px;
+  transition:transform .15s ease, background .2s ease;
+}
+.routine-card.done{background:linear-gradient(135deg, rgba(110,231,183,.14), var(--panel));}
+.chk{
+  width:30px; height:30px; border-radius:50%;
+  border:2px solid var(--ink-muted);
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  transition:all .18s ease;
+  background:transparent;
+}
+.chk svg{width:16px; height:16px; opacity:0; transform:scale(.5); transition:all .18s ease;}
+.routine-card.done .chk{background:var(--mint); border-color:var(--mint);}
+.routine-card.done .chk svg{opacity:1; transform:scale(1);}
+.r-body{flex:1; min-width:0;}
+.r-name{font-size:14.5px; font-weight:500; color:var(--ink);}
+.r-meta{display:flex; gap:8px; align-items:center; margin-top:4px;}
+.pt-badge{font-size:10.5px; padding:2px 8px; border-radius:20px; font-weight:700;}
+.pt-badge.w1{background:rgba(143,166,199,.2); color:#c7d5ea;}
+.pt-badge.w2{background:rgba(185,139,255,.2); color:#d9c3ff;}
+.pt-badge.w3{background:rgba(244,183,64,.2); color:#ffd98a;}
+.streak-tag{font-size:11px; color:var(--coral); font-weight:700;}
+.r-menu{width:26px; height:26px; flex:0 0 auto; color:var(--ink-muted); cursor:pointer; opacity:.7; background:none; border:none;}
+
+.add-routine-btn{
+  width:100%; padding:13px; border-radius:18px; border:1.5px dashed var(--line);
+  background:transparent; color:var(--ink-muted); font-family:'Zen Maru Gothic'; font-size:13.5px; font-weight:700;
+  cursor:pointer; margin-top:4px;
+}
+.add-routine-btn:hover{border-color:var(--violet); color:var(--violet);}
+
+/* ---------- Gacha ---------- */
+.gacha-stage{
+  background:radial-gradient(ellipse at 50% 20%, rgba(185,139,255,.18), transparent 60%), var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:26px 20px 22px;
+  text-align:center;
+  margin-top:6px;
+}
+.capsule{
+  width:120px; height:120px; margin:6px auto 14px;
+  position:relative;
+}
+.capsule .cap-svg{width:100%; height:100%;}
+.capsule.shake{animation:capshake .55s ease;}
+@keyframes capshake{
+  0%,100%{transform:translateX(0) rotate(0);}
+  15%{transform:translateX(-6px) rotate(-6deg);}
+  30%{transform:translateX(6px) rotate(6deg);}
+  45%{transform:translateX(-6px) rotate(-5deg);}
+  60%{transform:translateX(5px) rotate(5deg);}
+  75%{transform:translateX(-3px) rotate(-3deg);}
+}
+.gacha-copy{font-size:13px; color:var(--ink-muted); margin-bottom:16px; line-height:1.6;}
+.gacha-btn{
+  font-family:'Yusei Magic'; font-size:15px; color:var(--void);
+  background:linear-gradient(135deg, var(--gold), #ffd98a);
+  border:none; border-radius:22px; padding:14px 30px;
+  cursor:pointer; box-shadow:0 6px 0 #b8862a, 0 8px 18px rgba(244,183,64,.3);
+  transition:transform .1s ease;
+}
+.gacha-btn:active{transform:translateY(4px); box-shadow:0 2px 0 #b8862a;}
+.gacha-btn:disabled{opacity:.4; cursor:not-allowed; box-shadow:none; transform:none;}
+.gacha-cost{font-size:11px; color:var(--ink-muted); margin-top:10px;}
+
+/* ---------- Zukan (collection) ---------- */
+.zukan-progress{
+  background:var(--panel); border:1px solid var(--line); border-radius:18px;
+  padding:14px 16px; margin-bottom:14px;
+}
+.zukan-progress .row{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-muted); margin-bottom:8px;}
+.bar-track{height:8px; border-radius:6px; background:rgba(255,255,255,.08); overflow:hidden;}
+.bar-fill{height:100%; border-radius:6px; background:linear-gradient(90deg, var(--mint), var(--violet));}
+.mon-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;}
+.mon-cell{
+  background:var(--panel); border:1px solid var(--line); border-radius:16px;
+  padding:10px 6px 8px; text-align:center; cursor:pointer;
+  position:relative;
+}
+.mon-cell.locked{opacity:.55;}
+.mon-cell .ring{
+  width:58px; height:58px; margin:0 auto 6px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--line);
+}
+.mon-cell.rarity-common .ring{border-color:var(--common);}
+.mon-cell.rarity-rare .ring{border-color:var(--rare); box-shadow:0 0 10px rgba(185,139,255,.35);}
+.mon-cell.rarity-legendary .ring{border-color:var(--gold); box-shadow:0 0 14px rgba(244,183,64,.45);}
+.mon-svg{width:38px; height:38px;}
+.mon-cell.locked .mon-svg{filter:grayscale(1) brightness(.5);}
+.mon-name{font-size:10.5px; font-weight:700; color:var(--ink);}
+.mon-frag{font-size:9.5px; color:var(--ink-muted); margin-top:2px;}
+
+/* ---------- Log ---------- */
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.stat-card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:12px 14px;}
+.stat-card .num{font-family:'Yusei Magic'; font-size:22px; color:var(--mint);}
+.stat-card .lbl{font-size:11px; color:var(--ink-muted); margin-top:2px;}
+.rate-row{margin-bottom:10px;}
+.rate-row .row{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px;}
+.today-list{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:12px 14px; margin-bottom:14px;}
+.today-list .item{font-size:13px; padding:5px 0; color:var(--ink); display:flex; gap:8px; align-items:center;}
+.today-list .empty{font-size:12.5px; color:var(--ink-muted);}
+.heat-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:5px;}
+.heat-cell{aspect-ratio:1; border-radius:5px; background:rgba(255,255,255,.06);}
+
+/* ---------- Bottom nav ---------- */
+nav.tabbar{
+  position:sticky; bottom:0; z-index:20;
+  display:flex; justify-content:space-around;
+  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(0deg, var(--void) 75%, transparent);
+  backdrop-filter:blur(6px);
+  border-top:1px solid var(--line);
+}
+.tab-btn{
+  background:none; border:none; color:var(--ink-muted); cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-family:'Zen Maru Gothic'; font-size:10.5px; font-weight:700;
+  padding:6px 14px; border-radius:14px; transition:all .15s ease;
+}
+.tab-btn svg{width:21px; height:21px;}
+.tab-btn.active{color:var(--ink); background:var(--panel-alt);}
+
+/* ---------- Modal ---------- */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(10,6,24,.72); backdrop-filter:blur(3px);
+  display:flex; align-items:flex-end; justify-content:center; z-index:100;
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+.modal-overlay.open{opacity:1; pointer-events:auto;}
+.modal-sheet{
+  width:100%; max-width:440px; background:var(--panel-alt);
+  border-radius:24px 24px 0 0; padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  transform:translateY(30px); transition:transform .25s ease;
+  max-height:82vh; overflow-y:auto;
+}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.modal-title{font-size:16px; font-weight:700; margin-bottom:14px;}
+.field{margin-bottom:14px;}
+.field label{font-size:12px; color:var(--ink-muted); display:block; margin-bottom:6px;}
+.field input[type=text]{
+  width:100%; padding:11px 13px; border-radius:12px; border:1px solid var(--line);
+  background:var(--panel); color:var(--ink); font-family:'Zen Maru Gothic'; font-size:14px;
+}
+.weight-choices{display:flex; gap:8px;}
+.weight-choices button{
+  flex:1; padding:10px 4px; border-radius:12px; border:1.5px solid var(--line);
+  background:var(--panel); color:var(--ink-muted); font-family:'Zen Maru Gothic'; font-weight:700; font-size:12.5px;
+  cursor:pointer;
+}
+.weight-choices button.sel{border-color:var(--gold); color:var(--gold); background:rgba(244,183,64,.1);}
+.modal-actions{display:flex; gap:10px; margin-top:6px;}
+.btn{flex:1; padding:12px; border-radius:14px; border:none; font-family:'Zen Maru Gothic'; font-weight:700; font-size:13.5px; cursor:pointer;}
+.btn.primary{background:var(--mint); color:#0d3b2a;}
+.btn.ghost{background:transparent; border:1.5px solid var(--line); color:var(--ink-muted);}
+.btn.danger{background:rgba(255,111,145,.15); color:var(--coral);}
+
+.reveal-card{text-align:center; padding:8px 0 4px;}
+.reveal-avatar{width:130px; height:130px; margin:0 auto 14px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;}
+.reveal-avatar .mon-svg{width:88px; height:88px;}
+.reveal-avatar.rarity-common{background:radial-gradient(circle, rgba(143,166,199,.22), transparent 70%); border:2px solid var(--common);}
+.reveal-avatar.rarity-rare{background:radial-gradient(circle, rgba(185,139,255,.26), transparent 70%); border:2px solid var(--rare); box-shadow:0 0 24px rgba(185,139,255,.4);}
+.reveal-avatar.rarity-legendary{background:radial-gradient(circle, rgba(244,183,64,.3), transparent 70%); border:2px solid var(--gold); box-shadow:0 0 30px rgba(244,183,64,.55);}
+.reveal-avatar.pop{animation:pop .4s cubic-bezier(.2,1.4,.4,1);}
+@keyframes pop{0%{transform:scale(.3); opacity:0;}70%{transform:scale(1.08); opacity:1;}100%{transform:scale(1);}}
+.reveal-tag{font-size:11px; font-weight:700; letter-spacing:.3px; padding:3px 12px; border-radius:20px; display:inline-block; margin-bottom:8px;}
+.reveal-tag.rarity-common{background:rgba(143,166,199,.2); color:var(--common);}
+.reveal-tag.rarity-rare{background:rgba(185,139,255,.2); color:var(--rare);}
+.reveal-tag.rarity-legendary{background:rgba(244,183,64,.2); color:var(--gold);}
+.reveal-name{font-family:'Yusei Magic'; font-size:19px; margin-bottom:4px;}
+.reveal-desc{font-size:12.5px; color:var(--ink-muted); margin-bottom:16px; line-height:1.6;}
+
+.detail-top{display:flex; gap:14px; align-items:center; margin-bottom:14px;}
+.detail-avatar{width:78px; height:78px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+.detail-avatar .mon-svg{width:52px; height:52px;}
+.detail-avatar.rarity-common{background:rgba(143,166,199,.15); border:2px solid var(--common);}
+.detail-avatar.rarity-rare{background:rgba(185,139,255,.15); border:2px solid var(--rare);}
+.detail-avatar.rarity-legendary{background:rgba(244,183,64,.18); border:2px solid var(--gold);}
+.detail-avatar.locked .mon-svg{filter:grayscale(1) brightness(.4);}
+
+/* ---------- Toast ---------- */
+.toast-wrap{position:fixed; top:14px; left:0; right:0; display:flex; flex-direction:column; align-items:center; gap:8px; z-index:200; pointer-events:none;}
+.toast{
+  background:var(--panel-alt); border:1px solid var(--line); color:var(--ink);
+  padding:10px 18px; border-radius:20px; font-size:12.5px; font-weight:500;
+  box-shadow:0 8px 20px rgba(0,0,0,.3);
+  animation:toastin .25s ease, toastout .3s ease 2.2s forwards;
+}
+@keyframes toastin{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);}}
+@keyframes toastout{to{opacity:0; transform:translateY(-8px);}}
+
+::-webkit-scrollbar{width:0; height:0;}
+@media (prefers-reduced-motion: reduce){
+  .capsule.shake, .reveal-avatar.pop{animation:none;}
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <header class="app-head">
+    <div class="head-top">
+      <div class="brand">Routine Monsters<small>ルーティンモンスターズ</small></div>
+      <div class="today" id="todayLabel"></div>
+    </div>
+    <div class="hud">
+      <div class="hud-chip">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F4B740"/><circle cx="12" cy="12" r="6.5" fill="#FFD98A"/></svg>
+        <div><div class="val" id="hudPoints">0</div><div class="lbl">ポイント</div></div>
+      </div>
+      <div class="hud-chip">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2c1 4-3 5-3 9a5 5 0 0010 0c0-2-1-3-2-4 .3 2-1 3-2 2 1-3-1-4-1-7-1 1-2 2-2 4-1-1-1-2 0-4z" fill="#FF6F91"/></svg>
+        <div><div class="val" id="hudStreak">0日</div><div class="lbl">連続達成</div></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent"></main>
+
+  <nav class="tabbar">
+    <button class="tab-btn" data-tab="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+      ホーム
+    </button>
+    <button class="tab-btn" data-tab="gacha">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M4 12h16"/></svg>
+      ガチャ
+    </button>
+    <button class="tab-btn" data-tab="zukan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      図鑑
+    </button>
+    <button class="tab-btn" data-tab="log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M11 19V4M18 19v-7"/></svg>
+      ログ
+    </button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"><div class="modal-sheet" id="modalSheet"></div></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============ DATA ============ */
+const WEIGHTS = [
+  {id:1, label:'軽い', pt:10},
+  {id:2, label:'ふつう', pt:20},
+  {id:3, label:'しっかり', pt:30},
+];
+const RARITY_META = {
+  common:{label:'コモン', color:'var(--common)'},
+  rare:{label:'レア', color:'var(--rare)'},
+  legendary:{label:'レジェンド', color:'var(--gold)'}
+};
+const RARITY_PULL = {
+  common:{wholeChance:.25, dupBonus:5},
+  rare:{wholeChance:.12, dupBonus:10},
+  legendary:{wholeChance:.05, dupBonus:30}
+};
+const MONSTERS = [
+  {id:'slime', name:'スライム', rarity:'common', need:5, c1:'#8FE3C7', c2:'#5FC9A8', body:'circle', parts:[],
+    desc:'水を飲むたびに、ぷるんと少しずつ育つ雫の精霊。触るとひんやり気持ちいい。'},
+  {id:'mogura', name:'つちもぐら', rarity:'common', need:5, c1:'#C9A46B', c2:'#8f6f45', body:'circle', parts:['ear','snout'],
+    desc:'掃除で舞うほこりを栄養にする、土の中で暮らす働き者。きれいな部屋が大好き。'},
+  {id:'hiyoko', name:'ひよっこソング', rarity:'common', need:5, c1:'#F4D35E', c2:'#e0a92a', body:'circle', parts:['beak'],
+    desc:'早起きした朝の澄んだ空気が好きで、目覚めるといつも小さく歌っている。'},
+  {id:'leaf', name:'のびのびリーフ', rarity:'common', need:5, c1:'#8BC34A', c2:'#5c9c2b', body:'circle', parts:['leaf'],
+    desc:'ストレッチのたびに葉が一枚のびる、のんびり屋の植物モンスター。'},
+  {id:'spider', name:'あるきグモ', rarity:'common', need:5, c1:'#B08968', c2:'#7a5c46', body:'circle', parts:['legs'],
+    desc:'散歩した歩数のぶんだけ、脚が少しずつ丈夫になっていく人懐っこい虫。'},
+  {id:'golem', name:'ゴーレム', rarity:'rare', need:10, c1:'#8D99AE', c2:'#5e6a80', body:'block', parts:[],
+    desc:'勉強で積み重ねた集中力が石になって生まれた、無口で頼れる巨人。'},
+  {id:'wolf', name:'こおりウルフ', rarity:'rare', need:10, c1:'#90CAF9', c2:'#5b9fd6', body:'circle', parts:['sharpear'],
+    desc:'早起きの澄んだ空気からうまれた、氷のように白い毛並みを持つ狼。'},
+  {id:'lizard', name:'ほのおトカゲ', rarity:'rare', need:10, c1:'#FF8A65', c2:'#e0562e', body:'circle', parts:['tailflame'],
+    desc:'続けようとする気持ちが、尾の炎になって静かに燃えているトカゲ。'},
+  {id:'jelly', name:'しんかいクラゲ', rarity:'rare', need:10, c1:'#7C4DFF', c2:'#5a2fd1', body:'dome', parts:['tentacle'],
+    desc:'静かな夜のストレッチのひとときに現れる、ふわりと発光するクラゲ。'},
+  {id:'bird', name:'いかづちバード', rarity:'rare', need:10, c1:'#FFD54F', c2:'#e0ab1f', body:'circle', parts:['wing','beak'],
+    desc:'散歩の足取りが軽くなった日に飛び立つ、雷の粒をまとった鳥。'},
+  {id:'dragon', name:'ドラゴン', rarity:'legendary', need:20, c1:'#F4B740', c2:'#FF6F91', body:'circle', parts:['wingbig','horn','tail'],
+    desc:'ルーティンを続けた者の前にだけ姿を見せるという、伝説の竜。'},
+  {id:'phoenix', name:'ふしぎフェニックス', rarity:'legendary', need:20, c1:'#FF6F91', c2:'#F4B740', body:'circle', parts:['wingbig','crest'],
+    desc:'やめかけた日にこそ飛来するという、再生の炎をまとった鳥。'},
+  {id:'kingdragon', name:'しんえんのりゅうおう', rarity:'legendary', need:20, c1:'#5B3E96', c2:'#231539', body:'circle', parts:['wingbig','hornbig'],
+    desc:'深い夜、最後まで頑張りぬいた人の前にだけ現れるという竜の王。'},
+];
+const DEFAULT_ROUTINES = [
+  {name:'水を飲む', weight:1},
+  {name:'10分掃除', weight:2},
+  {name:'ストレッチ', weight:1},
+  {name:'早起き', weight:2},
+  {name:'散歩', weight:2},
+  {name:'勉強30分', weight:3},
+];
+
+/* ============ STATE ============ */
+let routines = [];      // {id,name,weight,streak,lastDate,total}
+let points = 0;
+let monsters = {};       // id -> {fragments, owned, obtainedAt}
+let logs = {};           // dateStr -> {completed:[ids], pts:number}
+let meta = {weekBonusGranted:null};
+
+const uid = () => Math.random().toString(36).slice(2,9);
+const pad = n => String(n).padStart(2,'0');
+const todayStr = (d=new Date()) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const addDays = (dateStr, n) => { const d=new Date(dateStr+'T00:00:00'); d.setDate(d.getDate()+n); return todayStr(d); };
+const mondayOf = (dateStr) => { const d=new Date(dateStr+'T00:00:00'); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return todayStr(d); };
+
+/* ============ STORAGE ============ */
+async function loadKey(key, fallback){
+  try{
+    const r = await window.storage.get(key, false);
+    if(r && r.value!=null) return JSON.parse(r.value);
+    return fallback;
+  }catch(e){ return fallback; }
+}
+async function saveKey(key, val){
+  try{ await window.storage.set(key, JSON.stringify(val), false); }catch(e){ console.error('save fail', key, e); }
+}
+async function loadAll(){
+  const [r, p, m, l, mt] = await Promise.all([
+    loadKey('rm_routines', null),
+    loadKey('rm_points', 0),
+    loadKey('rm_monsters', {}),
+    loadKey('rm_logs', {}),
+    loadKey('rm_meta', {weekBonusGranted:null}),
+  ]);
+  routines = r || DEFAULT_ROUTINES.map(d=>({id:uid(), name:d.name, weight:d.weight, streak:0, lastDate:null, total:0}));
+  if(!r) await saveKey('rm_routines', routines);
+  points = p;
+  monsters = m;
+  logs = l;
+  meta = mt;
+}
+
+/* ============ TOAST ============ */
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 2600);
+}
+
+/* ============ MONSTER SVG ============ */
+function svgMonster(m){
+  const c1=m.c1, c2=m.c2||c1;
+  let back='', front='';
+  const P = m.parts||[];
+  if(P.includes('wing')) back += `<ellipse cx="14" cy="55" rx="15" ry="24" fill="${c2}" opacity=".85" transform="rotate(-25 14 55)"/><ellipse cx="86" cy="55" rx="15" ry="24" fill="${c2}" opacity=".85" transform="rotate(25 86 55)"/>`;
+  if(P.includes('wingbig')) back += `<path d="M50,52 C18,30 -12,52 4,90 C26,78 42,64 50,52" fill="${c2}"/><path d="M50,52 C82,30 112,52 96,90 C74,78 58,64 50,52" fill="${c2}"/>`;
+  if(P.includes('tail')) back += `<path d="M80,80 Q108,90 100,62 Q97,80 80,80" fill="${c2}"/>`;
+  if(P.includes('tailflame')) back += `<path d="M78,82 Q102,96 91,68 Q101,78 83,72 Z" fill="${c2}"/>`;
+  if(P.includes('legs')){ for(let i=0;i<4;i++){ back += `<ellipse cx="${30+i*14}" cy="93" rx="4" ry="8" fill="${c2}"/>`; } }
+  if(P.includes('tentacle')){ for(let i=0;i<5;i++){ back += `<path d="M${28+i*11},84 q-3,15 3,25" stroke="${c2}" stroke-width="5" fill="none" stroke-linecap="round"/>`; } }
+
+  if(P.includes('ear')) front += `<ellipse cx="26" cy="20" rx="9" ry="14" fill="${c1}" transform="rotate(-20 26 20)"/><ellipse cx="74" cy="20" rx="9" ry="14" fill="${c1}" transform="rotate(20 74 20)"/>`;
+  if(P.includes('sharpear')) front += `<polygon points="18,32 27,4 34,33" fill="${c1}"/><polygon points="82,32 73,4 66,33" fill="${c1}"/>`;
+  if(P.includes('horn')) front += `<polygon points="40,22 46,3 52,22" fill="${c2}"/><polygon points="60,22 66,3 72,22" fill="${c2}"/>`;
+  if(P.includes('hornbig')) front += `<polygon points="33,24 44,-8 55,26" fill="${c2}"/><polygon points="67,24 56,-8 45,26" fill="${c2}" opacity=".85"/>`;
+  if(P.includes('leaf')) front += `<ellipse cx="50" cy="6" rx="7" ry="16" fill="${c2}" transform="rotate(-8 50 6)"/>`;
+  if(P.includes('beak')) front += `<polygon points="44,58 56,58 50,68" fill="${c2}"/>`;
+  if(P.includes('snout')) front += `<ellipse cx="50" cy="61" rx="12" ry="8" fill="${c2}"/>`;
+  if(P.includes('crest')) front += `<path d="M40,10 Q50,-10 60,10 Q50,2 40,10" fill="${c2}"/>`;
+
+  const body = m.body==='block'
+    ? `<rect x="19" y="19" width="62" height="62" rx="16" fill="${c1}"/>`
+    : m.body==='dome'
+    ? `<path d="M14,72 a36,36 0 0 1 72,0 Z" fill="${c1}"/>`
+    : `<circle cx="50" cy="55" r="34" fill="${c1}"/>`;
+
+  return `<svg class="mon-svg" viewBox="0 0 100 100">${back}${body}${front}
+    <circle cx="40" cy="53" r="4.5" fill="#20142f"/><circle cx="60" cy="53" r="4.5" fill="#20142f"/>
+    <circle cx="41.3" cy="51.5" r="1.4" fill="#fff"/><circle cx="61.3" cy="51.5" r="1.4" fill="#fff"/>
+  </svg>`;
+}
+
+/* ============ ROUTINE LOGIC ============ */
+function todayCompletedIds(){
+  const t = todayStr();
+  return (logs[t] && logs[t].completed) || [];
+}
+function isDoneToday(routineId){
+  return todayCompletedIds().includes(routineId);
+}
+async function toggleRoutine(routineId){
+  const t = todayStr();
+  const routine = routines.find(r=>r.id===routineId);
+  if(!routine) return;
+  if(!logs[t]) logs[t] = {completed:[], pts:0};
+  const done = logs[t].completed.includes(routineId);
+
+  if(!done){
+    // complete it
+    const weightDef = WEIGHTS.find(w=>w.id===routine.weight) || WEIGHTS[0];
+    const yest = addDays(t, -1);
+    if(routine.lastDate === yest) routine.streak += 1;
+    else if(routine.lastDate !== t) routine.streak = 1;
+    routine.lastDate = t;
+    routine.total = (routine.total||0) + 1;
+    const streakBonus = Math.min(routine.streak-1, 5);
+    const earned = weightDef.pt + streakBonus;
+    points += earned;
+    logs[t].completed.push(routineId);
+    logs[t].pts += earned;
+    await Promise.all([saveKey('rm_routines', routines), saveKey('rm_points', points), saveKey('rm_logs', logs)]);
+    toast(`「${routine.name}」達成！ +${earned}pt`);
+    await checkWeeklyBonus();
+  } else {
+    // undo same-day mistake
+    const weightDef = WEIGHTS.find(w=>w.id===routine.weight) || WEIGHTS[0];
+    const streakBonus = Math.min(routine.streak-1, 5);
+    const earned = weightDef.pt + streakBonus;
+    points = Math.max(0, points - earned);
+    logs[t].completed = logs[t].completed.filter(id=>id!==routineId);
+    logs[t].pts = Math.max(0, logs[t].pts - earned);
+    routine.total = Math.max(0, (routine.total||0) - 1);
+    const yest = addDays(t,-1);
+    routine.streak = routine.streak>0 ? routine.streak-1 : 0;
+    routine.lastDate = routine.streak>0 ? yest : null;
+    await Promise.all([saveKey('rm_routines', routines), saveKey('rm_points', points), saveKey('rm_logs', logs)]);
+  }
+  render();
+}
+
+function overallStreak(){
+  let count=0; let d=todayStr();
+  while(logs[d] && logs[d].completed && logs[d].completed.length>0){
+    count++; d=addDays(d,-1);
+  }
+  return count;
+}
+
+async function checkWeeklyBonus(){
+  const wk = mondayOf(todayStr());
+  if(meta.weekBonusGranted===wk) return;
+  let done=0, possible=0;
+  for(let i=0;i<7;i++){
+    const d = addDays(wk, i);
+    if(d>todayStr()) break;
+    possible += routines.length;
+    done += (logs[d] && logs[d].completed.length) || 0;
+  }
+  if(possible>0 && (done/possible) >= 0.8){
+    points += 50;
+    meta.weekBonusGranted = wk;
+    await Promise.all([saveKey('rm_points', points), saveKey('rm_meta', meta)]);
+    toast('今週の達成率80%突破！ ウィークリーボーナス +50pt');
+  }
+}
+
+/* ============ GACHA ============ */
+function pickMonsterId(){
+  const pools = {common:[], rare:[], legendary:[]};
+  MONSTERS.forEach(m=>pools[m.rarity].push(m.id));
+  const roll = Math.random()*100;
+  let rarity;
+  if(roll < 60) rarity='common';
+  else if(roll < 90) rarity='rare';
+  else rarity='legendary';
+  const list = pools[rarity];
+  return list[Math.floor(Math.random()*list.length)];
+}
+
+async function pullGacha(){
+  if(points < 10) return;
+  points -= 10;
+  await saveKey('rm_points', points);
+
+  const monId = pickMonsterId();
+  const m = MONSTERS.find(x=>x.id===monId);
+  const state = monsters[monId] || {fragments:0, owned:false, obtainedAt:null};
+  const rule = RARITY_PULL[m.rarity];
+
+  let resultType, gained;
+  if(state.owned){
+    resultType='dup';
+    gained = rule.dupBonus;
+    points += gained;
+    await saveKey('rm_points', points);
+  } else if(Math.random() < rule.wholeChance){
+    resultType='whole';
+    state.owned = true;
+    state.obtainedAt = todayStr();
+    state.fragments = m.need;
+  } else {
+    resultType='fragment';
+    state.fragments = Math.min(m.need, (state.fragments||0)+1);
+    if(state.fragments >= m.need){
+      state.owned = true;
+      state.obtainedAt = todayStr();
+      resultType='complete';
+    }
+  }
+  monsters[monId] = state;
+  await saveKey('rm_monsters', monsters);
+  return {m, resultType, gained: gained||0, state};
+}
+
+/* ============ RENDER ============ */
+let currentTab = 'home';
+
+function renderHUD(){
+  document.getElementById('hudPoints').textContent = points;
+  document.getElementById('hudStreak').textContent = overallStreak()+'日';
+  const d = new Date();
+  const days=['日','月','火','水','木','金','土'];
+  document.getElementById('todayLabel').textContent = `${d.getMonth()+1}月${d.getDate()}日(${days[d.getDay()]})`;
+}
+
+function renderHome(){
+  const doneIds = todayCompletedIds();
+  const rows = routines.map(r=>{
+    const done = doneIds.includes(r.id);
+    const w = WEIGHTS.find(x=>x.id===r.weight)||WEIGHTS[0];
+    return `<div class="routine-card ${done?'done':''}" data-id="${r.id}">
+      <button class="chk" data-action="toggle" data-id="${r.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0d3b2a" stroke-width="3" stroke-linecap="round"><polyline points="4,13 9,18 20,6"/></svg>
+      </button>
+      <div class="r-body" data-action="toggle" data-id="${r.id}">
+        <div class="r-name">${escapeHtml(r.name)}</div>
+        <div class="r-meta">
+          <span class="pt-badge w${r.weight}">${w.pt}pt</span>
+          ${r.streak>0 ? `<span class="streak-tag">🔥${r.streak}日連続</span>` : ''}
+        </div>
+      </div>
+      <button class="r-menu" data-action="edit" data-id="${r.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="section-title">今日のルーティン <span class="sub">${doneIds.length}/${routines.length} 完了</span></div>
+    ${rows || '<div class="today-list"><div class="empty">まだルーティンがありません。追加してみましょう。</div></div>'}
+    <button class="add-routine-btn" data-action="add-routine">＋ ルーティンを追加</button>
+  `;
+}
+
+function renderGacha(){
+  return `
+    <div class="section-title">モンスターガチャ</div>
+    <div class="gacha-stage">
+      <div class="capsule" id="capsuleEl">
+        <svg class="cap-svg" viewBox="0 0 100 100">
+          <path d="M10,50 a40,40 0 0 1 80,0 z" fill="#B98BFF"/>
+          <path d="M10,50 a40,40 0 0 0 80,0 z" fill="#F5F0FF"/>
+          <rect x="8" y="47" width="84" height="6" rx="3" fill="#20142f" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="gacha-copy">ポイントを使ってガチャを回そう。<br>モンスター本体か、かけらが手に入るよ。</div>
+      <button class="gacha-btn" id="gachaBtn" ${points<10?'disabled':''}>ガチャを回す</button>
+      <div class="gacha-cost">1回 10pt ・ 所持ポイント ${points}pt</div>
+    </div>
+  `;
+}
+
+function renderZukan(){
+  const owned = MONSTERS.filter(m=>monsters[m.id] && monsters[m.id].owned).length;
+  const pct = Math.round(owned/MONSTERS.length*100);
+  const cells = MONSTERS.map(m=>{
+    const st = monsters[m.id] || {fragments:0, owned:false};
+    const locked = !st.owned;
+    return `<div class="mon-cell rarity-${m.rarity} ${locked?'locked':''}" data-action="mon-detail" data-id="${m.id}">
+      <div class="ring">${svgMonster(m)}</div>
+      <div class="mon-name">${locked && st.fragments===0 ? '？？？' : escapeHtml(m.name)}</div>
+      <div class="mon-frag">${st.owned ? 'なかま' : `${st.fragments||0}/${m.need}`}</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="section-title">モンスター図鑑</div>
+    <div class="zukan-progress">
+      <div class="row"><span>コンプリート率</span><span>${owned}/${MONSTERS.length} (${pct}%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="mon-grid">${cells}</div>
+  `;
+}
+
+function renderLog(){
+  const t = todayStr();
+  const todayList = (logs[t] && logs[t].completed) || [];
+  const todayNames = todayList.map(id=>{
+    const r = routines.find(x=>x.id===id);
+    return r ? r.name : null;
+  }).filter(Boolean);
+
+  const wk = mondayOf(t);
+  let wDone=0, wPossible=0;
+  for(let i=0;i<7;i++){ const d=addDays(wk,i); if(d>t) break; wPossible+=routines.length; wDone += (logs[d]&&logs[d].completed.length)||0; }
+  const wRate = wPossible ? Math.round(wDone/wPossible*100) : 0;
+
+  const monthStart = t.slice(0,8)+'01';
+  const daysInMonth = new Date(Number(t.slice(0,4)), Number(t.slice(5,7)), 0).getDate();
+  let mDone=0, mPossible=0;
+  for(let i=0;i<daysInMonth;i++){ const d=addDays(monthStart,i); if(d>t) break; mPossible+=routines.length; mDone += (logs[d]&&logs[d].completed.length)||0; }
+  const mRate = mPossible ? Math.round(mDone/mPossible*100) : 0;
+
+  const heatCells = [];
+  for(let i=27;i>=0;i--){
+    const d = addDays(t, -i);
+    const c = (logs[d] && logs[d].completed.length) || 0;
+    let bg = 'rgba(255,255,255,.06)';
+    if(c>=1 && c<3) bg='rgba(110,231,183,.35)';
+    else if(c>=3) bg='rgba(110,231,183,.85)';
+    heatCells.push(`<div class="heat-cell" style="background:${bg}" title="${d}: ${c}件"></div>`);
+  }
+
+  return `
+    <div class="section-title">達成ログ</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">${overallStreak()}日</div><div class="lbl">連続達成日数</div></div>
+      <div class="stat-card"><div class="num">${points}pt</div><div class="lbl">所持ポイント</div></div>
+    </div>
+    <div class="rate-row"><div class="row"><span>週間達成率</span><span>${wRate}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${wRate}%"></div></div></div>
+    <div class="rate-row"><div class="row"><span>月間達成率</span><span>${mRate}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${mRate}%"></div></div></div>
+    <div class="section-title" style="margin-bottom:8px;">今日達成したルーティン</div>
+    <div class="today-list">
+      ${todayNames.length ? todayNames.map(n=>`<div class="item">✅ ${escapeHtml(n)}</div>`).join('') : '<div class="empty">まだ達成していません。ホームから始めましょう。</div>'}
+    </div>
+    <div class="section-title" style="margin-bottom:8px;">直近28日間の記録</div>
+    <div class="heat-grid">${heatCells.join('')}</div>
+  `;
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function render(){
+  renderHUD();
+  const main = document.getElementById('mainContent');
+  if(currentTab==='home') main.innerHTML = renderHome();
+  else if(currentTab==='gacha') main.innerHTML = renderGacha();
+  else if(currentTab==='zukan') main.innerHTML = renderZukan();
+  else if(currentTab==='log') main.innerHTML = renderLog();
+
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===currentTab));
+  attachContentEvents();
+}
+
+/* ============ MODALS ============ */
+function openModal(html){
+  document.getElementById('modalSheet').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id==='modalOverlay') closeModal();
+});
+
+function openAddRoutine(existing){
+  const editing = !!existing;
+  const selWeight = existing ? existing.weight : 1;
+  openModal(`
+    <div class="modal-title">${editing?'ルーティンを編集':'ルーティンを追加'}</div>
+    <div class="field">
+      <label>ルーティン名</label>
+      <input type="text" id="rname" value="${existing?escapeHtml(existing.name):''}" placeholder="例：水を飲む" maxlength="20">
+    </div>
+    <div class="field">
+      <label>重さ（ポイント）</label>
+      <div class="weight-choices" id="weightChoices">
+        ${WEIGHTS.map(w=>`<button type="button" data-w="${w.id}" class="${w.id===selWeight?'sel':''}">${w.label}<br>${w.pt}pt</button>`).join('')}
+      </div>
+    </div>
+    <div class="modal-actions">
+      ${editing?'<button class="btn danger" id="delBtn">削除</button>':''}
+      <button class="btn ghost" id="cancelBtn">キャンセル</button>
+      <button class="btn primary" id="saveBtn">保存</button>
+    </div>
+  `);
+  let chosen = selWeight;
+  document.getElementById('weightChoices').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    chosen = Number(b.dataset.w);
+    document.querySelectorAll('#weightChoices button').forEach(x=>x.classList.toggle('sel', Number(x.dataset.w)===chosen));
+  });
+  document.getElementById('cancelBtn').onclick = closeModal;
+  document.getElementById('saveBtn').onclick = async ()=>{
+    const name = document.getElementById('rname').value.trim();
+    if(!name){ toast('ルーティン名を入力してください'); return; }
+    if(editing){
+      existing.name = name; existing.weight = chosen;
+    } else {
+      routines.push({id:uid(), name, weight:chosen, streak:0, lastDate:null, total:0});
+    }
+    await saveKey('rm_routines', routines);
+    closeModal(); render();
+  };
+  if(editing){
+    document.getElementById('delBtn').onclick = async ()=>{
+      routines = routines.filter(r=>r.id!==existing.id);
+      await saveKey('rm_routines', routines);
+      closeModal(); render();
+    };
+  }
+}
+
+function openMonsterDetail(monId){
+  const m = MONSTERS.find(x=>x.id===monId);
+  const st = monsters[monId] || {fragments:0, owned:false, obtainedAt:null};
+  const locked = !st.owned;
+  const rMeta = RARITY_META[m.rarity];
+  openModal(`
+    <div class="detail-top">
+      <div class="detail-avatar rarity-${m.rarity} ${locked?'locked':''}">${svgMonster(m)}</div>
+      <div>
+        <div class="reveal-tag rarity-${m.rarity}">${rMeta.label}</div>
+        <div class="modal-title" style="margin-bottom:2px;">${locked && st.fragments===0 ? '？？？' : escapeHtml(m.name)}</div>
+        <div style="font-size:12px; color:var(--ink-muted);">${st.owned ? `${st.obtainedAt} になかまになった` : `かけら ${st.fragments||0} / ${m.need}`}</div>
+      </div>
+    </div>
+    ${!st.owned ? `<div class="bar-track" style="margin-bottom:14px;"><div class="bar-fill" style="width:${Math.min(100,(st.fragments||0)/m.need*100)}%"></div></div>` : ''}
+    <div style="font-size:13px; line-height:1.7; color:var(--ink);">
+      ${st.owned ? escapeHtml(m.desc) : 'なかまにすると、図鑑の説明を読めるようになります。'}
+    </div>
+    <div class="modal-actions" style="margin-top:18px;">
+      <button class="btn ghost" id="closeDetail" style="flex:1;">とじる</button>
+    </div>
+  `);
+  document.getElementById('closeDetail').onclick = closeModal;
+}
+
+async function openGachaReveal(){
+  const capsule = document.getElementById('capsuleEl');
+  capsule.classList.add('shake');
+  const btn = document.getElementById('gachaBtn');
+  btn.disabled = true;
+  const resultPromise = pullGacha();
+  await new Promise(res=>setTimeout(res, 600));
+  const result = await resultPromise;
+  capsule.classList.remove('shake');
+  render(); // update points display in background
+
+  if(!result) return;
+  const {m, resultType, gained, state} = result;
+  const rMeta = RARITY_META[m.rarity];
+  let headline, sub;
+  if(resultType==='whole'){ headline = `${m.name} を てにいれた！`; sub='モンスター本体が出現！'; }
+  else if(resultType==='complete'){ headline = `${m.name} が かんせい！`; sub='かけらが集まってなかまになった！'; }
+  else if(resultType==='dup'){ headline = `${m.name} のかけら…のはずが`; sub = `すでになかまだったので +${gained}pt に変換された`; }
+  else { headline = `${m.name} のかけらを 1個 手に入れた`; sub = `のこり ${m.need-state.fragments} 個で なかまになる`; }
+
+  openModal(`
+    <div class="reveal-card">
+      <div class="reveal-avatar rarity-${m.rarity} pop">${svgMonster(m)}</div>
+      <div class="reveal-tag rarity-${m.rarity}">${rMeta.label}</div>
+      <div class="reveal-name">${escapeHtml(headline)}</div>
+      <div class="reveal-desc">${escapeHtml(sub)}</div>
+      <div class="modal-actions">
+        <button class="btn primary" id="closeReveal" style="flex:1;">とじる</button>
+      </div>
+    </div>
+  `);
+  document.getElementById('closeReveal').onclick = ()=>{ closeModal(); render(); };
+}
+
+/* ============ EVENTS ============ */
+function attachContentEvents(){
+  document.querySelectorAll('[data-action="toggle"]').forEach(el=>{
+    el.addEventListener('click', ()=>toggleRoutine(el.dataset.id));
+  });
+  document.querySelectorAll('[data-action="edit"]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const r = routines.find(x=>x.id===el.dataset.id);
+      if(r) openAddRoutine(r);
+    });
+  });
+  const addBtn = document.querySelector('[data-action="add-routine"]');
+  if(addBtn) addBtn.addEventListener('click', ()=>openAddRoutine(null));
+
+  document.querySelectorAll('[data-action="mon-detail"]').forEach(el=>{
+    el.addEventListener('click', ()=>openMonsterDetail(el.dataset.id));
+  });
+
+  const gachaBtn = document.getElementById('gachaBtn');
+  if(gachaBtn) gachaBtn.addEventListener('click', openGachaReveal);
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    currentTab = btn.dataset.tab;
+    render();
+  });
+});
+
+/* ============ INIT ============ */
+(async function init(){
+  await loadAll();
+  render();
+})();
+</script>
+</body>
+</html>
